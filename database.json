@@ -1,0 +1,54 @@
+[
+    {
+        "name": "The Winter Wonderland Wrap",
+        "buy": {
+            "keys": 1,
+            "metal": 10.33
+        },
+        "sell": {
+            "keys": 2,
+            "metal": 10.44
+        },
+        "maxStock": 1,
+        "itemSku": "976;6"
+    },
+    {
+        "name": "Winter 2018 Cosmetic Case",
+        "buy": {
+            "keys": 1,
+            "metal": 1.33
+        },
+        "sell": {
+            "keys": 2,
+            "metal": 1.44
+        },
+        "maxStock": 1,
+        "itemSku": "a"
+    },
+    {
+        "name": "Soldier's Slope Scopers",
+        "buy": {
+            "keys": 0,
+            "metal": 0
+        },
+        "sell": {
+            "keys": 0,
+            "metal": 0
+        },
+        "maxStock": 1,
+        "itemSku": "a"
+    },
+    {
+        "name": "Tyrant's Helm",
+        "buy": {
+            "keys": 0,
+            "metal": 0
+        },
+        "sell": {
+            "keys": 0,
+            "metal": 0
+        },
+        "maxStock": 1,
+        "itemSku": ""
+    }
+]
