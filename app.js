@@ -11,7 +11,7 @@ const config = require('./config.js')
 const utils = require('./utilities.js')
 
 const log = console.log
-//const schemaManager = new Schema({ apiKey: '64161DE6D2F6437CA5A64C40E54583AC'});
+//const schemaManager = new Schema({ apiKey: 'api key here'});
 
 let client = new SteamUser();
 const community = new SteamCommunity();
