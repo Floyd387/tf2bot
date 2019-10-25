@@ -51,9 +51,10 @@ client.on('error', (error) => {
 	log(chalk.red.bold('[ info ] ') + 'Error: Could not log into Steam ' + error)
 })
 
-let signingIn = true
+
 
 // Web Session
+let signingIn = true
 client.on('webSession', (sessionID, cookies) => {
     manager.setCookies(cookies, (error) => {
         if (error) {
