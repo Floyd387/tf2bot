@@ -36,7 +36,7 @@ const logOnOptions = {
 client.logOn(logOnOptions)
 
 client.on('loggedOn', () => {
-    log(chalk.blue.bold('[ info ] ') + `Success: Connected to Steam as ${config.botName}`)
+    log(chalk.magenta.bold('[ info ] ') + `Success: Connected to Steam as ${config.botName}`)
     client.setPersona(SteamUser.EPersonaState.Online, config.botName) 
     client.gamesPlayed(440)
     client.chat.sendFriendMessage(config.botAdminAccount, "[ info ] I have successfully logged into Steam!", (error) => {
@@ -47,9 +47,7 @@ client.on('loggedOn', () => {
 })
 
 // Error Handling
-client.on('error', (error) => {
-	log(chalk.red.bold('[ info ] ') + 'Error: Could not log into Steam ' + error)
-})
+client.on('error', (error) => log(chalk.magenta.bold('[ info ] ') + 'Error: Could not log into Steam ' + error))
 
 
 
@@ -58,14 +56,14 @@ let signingIn = true
 client.on('webSession', (sessionID, cookies) => {
     manager.setCookies(cookies, (error) => {
         if (error) {
-            log(chalk.red.bold('[ info ] ') + 'Error: Could not set cookies ' + error)
+            log(chalk.magenta.bold('[ info ] ') + 'Error: Could not set cookies ' + error)
             process.exit(1) // Fatal error since we couldn't get our API key
 			return
         }
-        log(chalk.blue.bold('[ info ] ') + `Got steam API key: ${manager.apiKey}`)
+        log(chalk.magenta.bold('[ info ] ') + `Got steam API key: ${manager.apiKey}`)
     })
     community.setCookies(cookies)
-    log(chalk.blue.bold('[ info ] ') + `Received a web session and set cookies!`)
+    log(chalk.magenta.bold('[ info ] ') + `Received a web session and set cookies!`)
     signingIn = false
 });
 
@@ -98,50 +96,24 @@ manager.on('newOffer', (offer) => {
 
     // I should probably wrap this into a big function that is called on event fire config.botAdminAccount
     if (offer.partner.getSteamID64() === 1) {
-        log(chalk.green.bold('[ trade ] ') + `New offer #${offer.id} from ADMIN`)
+        log(chalk.blue.bold('[ trade ] ') + `New offer #${offer.id} from ADMIN`)
         
         acceptOffer(offer).catch((error) => {
             throw new Error(error)
         })
 
     } else {
-        log(chalk.green.bold('[ trade ] ') + `New offer #${offer.id} from #${offer.partner.getSteamID64()}`)
+        log(chalk.blue.bold('[ trade ] ') + chalk.bold(`New offer #${offer.id} from #${offer.partner.getSteamID64()}`))
+        
         let database = utils.loadDatabase()
         
         const itemsToGive = offer.itemsToGive.map(item => item.market_hash_name) // this is an arry of item names // market hash name
         const itemsToReceive = offer.itemsToReceive.map(item => item.market_hash_name) // this is an array of item names // market Hash name
-
-    
-        // Value of items to give (takes sell.metal and sell.keys)
-        const itemsToGiveValue = (database, itemsToGive) => {  
-            
-            sellItem = {
-                keys: 0,
-                metal: 0
-            }
-            
-            itemsToGive.forEach((item) => {
-
-                database.find((dataItem) => {
-                    if (item == dataItem.name) {
-                        sellItem.keys += dataItem.sell.keys
-                        sellItem.metal += dataItem.sell.metal
-                    }
-                })
-
-            })
-            return sellItem
-
-        }
-
-        let sellValue = itemsToGiveValue(database, itemsToGive)
-        console.log(sellValue.keys)
-       // const itemsToGiveValue = sellValue(database, itemsToGive)
-        
-
-
-        // console.log('Items to give: ' + itemsToGive + ' value: ' + itemsToGiveValue)
-        // console.log('Items to receive: ' + itemsToReceive)
+        let itemsToGiveValue = utils.getValueItemsToGive(database, itemsToGive) // <- got the value
+        let itemsToReceiveValue = utils.getValueItemsToReceive(database, itemsToReceive)
+         
+        log(chalk.blue.bold('[ trade ] ') + chalk.green.bold(`Items to give: `) + `${itemsToGive.join(', ')} -> value: ${itemsToGiveValue.keys} keys ${itemsToGiveValue.metal} refined`)
+        log(chalk.blue.bold('[ trade ] ') + chalk.red.bold(`Items to receive: `) + `${itemsToReceive.join(', ')} -> value: ${itemsToReceiveValue.keys} keys ${itemsToReceiveValue.metal} refined`)
     }
 })
 
@@ -149,18 +121,18 @@ manager.on('newOffer', (offer) => {
 const acceptOffer = (offer) => new Promise((resolve, reject) => {
     offer.accept((error, status) => {
         if (error) {
-            reject(log(chalk.red.bold('[ trade ]') + `Unable to accept a trade offer: ${error.message}`))
+            reject(log(chalk.magenta.bold('[ trade ]') + `Unable to accept a trade offer: ${error.message}`))
         } else {
             if (status == 'pending') {
                 community.acceptConfirmationForObject(config.identitySecret, offer.id, (error) => {
                     if (error) {
-                        log(chalk.red.bold('[ trade ]') + `Unable to confirm a trade offer: ${error.message}`)
+                        log(chalk.magenta.bold('[ trade ]') + `Unable to confirm a trade offer: ${error.message}`)
                     } else {
-                        log(chalk.green.bold('[ trade ] ') + `Confirmed a trade offer #${offer.id}!`) 
+                        log(chalk.blue.bold('[ trade ] ') + `Confirmed a trade offer #${offer.id}!`) 
                     }
                 })
             }
-            log(chalk.green.bold('[ trade ] ') + `Accepted a trade offer #${offer.id} from #${offer.partner.getSteamID64()}!`)
+            log(chalk.blue.bold('[ trade ] ') + `Accepted a trade offer #${offer.id} from #${offer.partner.getSteamID64()}!`)
             resolve(offer) 
         } 
     })  
@@ -168,19 +140,19 @@ const acceptOffer = (offer) => new Promise((resolve, reject) => {
 
 manager.on('receivedOfferChanged', (offer, oldState) => {
     if (offer.state === 3) { // Accepted
-        log(chalk.green.bold('[ trade ] ') + `Trade offer #${offer.id} changed: ${TradeOfferManager.ETradeOfferState[oldState]} -> ${TradeOfferManager.ETradeOfferState[offer.state]}`)
+        log(chalk.blue.bold('[ trade ] ') + `Trade offer #${offer.id} changed: ${TradeOfferManager.ETradeOfferState[oldState]} -> ${TradeOfferManager.ETradeOfferState[offer.state]}`)
         notifyAdmin(offer)
-        log(chalk.green.bold('[ trade ] ') + `Notified admin!`)
+        log(chalk.blue.bold('[ trade ] ') + `Notified admin!`)
 
         offer.getExchangeDetails((error, status, tradeInitTime, receivedItems, sentItems) => {
             if (error) {
-                log(chalk.red.bold('[ trade ] ') + 'Error: Could not get traded items ' + error)
+                log(chalk.magenta.bold('[ trade ] ') + 'Error: Could not get traded items ' + error)
                 return
             } 
                 let newReceivedItems = receivedItems.map(item => item.market_hash_name);
                 let newSentItems = sentItems.map(item => item.market_hash_name);
-                log(chalk.green.bold('[ trade ] ') + 'Items received: ' + newReceivedItems.join(', '))
-                log(chalk.green.bold('[ trade ] ') + 'Items sent: ' + newSentItems.join(', '))
+                log(chalk.blue.bold('[ trade ] ') + 'Items received: ' + newReceivedItems.join(', '))
+                log(chalk.blue.bold('[ trade ] ') + 'Items sent: ' + newSentItems.join(', '))
           
         })
     }

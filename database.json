@@ -13,7 +13,7 @@
         "itemSku": "976;6"
     },
     {
-        "name": "Winter 2018 Cosmetic Case",
+        "name": "Abominable Cosmetic Case",
         "buy": {
             "keys": 1,
             "metal": 1.33
@@ -26,14 +26,14 @@
         "itemSku": "a"
     },
     {
-        "name": "Soldier's Slope Scopers",
+        "name": "Winter 2018 Cosmetic Case",
         "buy": {
-            "keys": 0,
-            "metal": 0
+            "keys": 5,
+            "metal": 10
         },
         "sell": {
-            "keys": 0,
-            "metal": 0
+            "keys": 6,
+            "metal": 1.11
         },
         "maxStock": 1,
         "itemSku": "a"
