@@ -117,42 +117,6 @@ const getValueItemsToReceive = (database, itemsToReceive) => {
 
 }
 
-
-// ACCEPTING AND DECLINING OFFERS
-
-// Accept offer
-const acceptOffer = (offer) => new Promise((resolve, reject) => {
-    offer.accept((error, status) => {
-        if (error) {
-            reject(log(chalk.magenta.bold('[ trade ]') + `Unable to accept a trade offer: ${error.message}`))
-        } else {
-            if (status == 'pending') {
-                community.acceptConfirmationForObject(config.identitySecret, offer.id, (error) => {
-                    if (error) {
-                        log(chalk.magenta.bold('[ trade ]') + `Unable to confirm a trade offer: ${error.message}`)
-                    } else {
-                        log(chalk.blue.bold('[ trade ] ') + `Confirmed a trade offer #${offer.id}!`) 
-                    }
-                })
-            }
-            log(chalk.blue.bold('[ trade ] ') + `Accepted a trade offer #${offer.id} from #${offer.partner.getSteamID64()}!`)
-            resolve(offer) 
-        } 
-    })  
-})
-
-// Decline offer
-const declineOffer = (offer) => new Promise((resolve, reject) => {
-    offer.decline((error, status) => {
-        if (error) {
-            reject(log(chalk.magenta.bold('[ trade ]') + `Unable to reject a trade offer: ${error.message}`))
-        } else {
-            log(chalk.blue.bold('[ trade ] ') + `Rejected a trade offer #${offer.id} from #${offer.partner.getSteamID64()}!`)
-            resolve(offer) 
-        }
-    })
-})
-
 module.exports = {
     loadDatabase: loadDatabase,
     saveDatabase: saveDatabase,
