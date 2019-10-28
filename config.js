@@ -8,5 +8,6 @@ module.exports = {
     sharedSecret: '',
     identitySecret: '',
     botAdminAccount: '',
-    mySteamAPIkey: ''
+    mySteamAPIkey: '',
+    keyToMetalConversionRate: '51.33'
 }
