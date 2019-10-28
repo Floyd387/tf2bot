@@ -110,39 +110,20 @@ manager.on('newOffer', (offer) => {
         const itemsToGive = offer.itemsToGive.map(item => item.market_hash_name) // this is an arry of item names // market hash name
         const itemsToReceive = offer.itemsToReceive.map(item => item.market_hash_name) // this is an array of item names // market Hash name
         let itemsToGiveValue = utils.getValueItemsToGive(database, itemsToGive) // <- got the value
-        let itemsToReceiveValue = utils.getValueItemsToReceive(database, itemsToReceive)
-         
-        log(chalk.blue.bold('[ trade ] ') + chalk.green.bold(`Items to give: `) + `${itemsToGive.join(', ')} -> value: ${itemsToGiveValue.keys} keys ${itemsToGiveValue.metal} refined`)
-        log(chalk.blue.bold('[ trade ] ') + chalk.red.bold(`Items to receive: `) + `${itemsToReceive.join(', ')} -> value: ${itemsToReceiveValue.keys} keys ${itemsToReceiveValue.metal} refined`)
-    }
-})
+        let itemsToReceiveValue = utils.getValueItemsToReceive(database, itemsToReceive) // <- Got the value
 
-// Accept offer
-const acceptOffer = (offer) => new Promise((resolve, reject) => {
-    offer.accept((error, status) => {
-        if (error) {
-            reject(log(chalk.magenta.bold('[ trade ]') + `Unable to accept a trade offer: ${error.message}`))
-        } else {
-            if (status == 'pending') {
-                community.acceptConfirmationForObject(config.identitySecret, offer.id, (error) => {
-                    if (error) {
-                        log(chalk.magenta.bold('[ trade ]') + `Unable to confirm a trade offer: ${error.message}`)
-                    } else {
-                        log(chalk.blue.bold('[ trade ] ') + `Confirmed a trade offer #${offer.id}!`) 
-                    }
-                })
-            }
-            log(chalk.blue.bold('[ trade ] ') + `Accepted a trade offer #${offer.id} from #${offer.partner.getSteamID64()}!`)
-            resolve(offer) 
-        } 
-    })  
+        log(chalk.blue.bold('[ trade ] ') + chalk.green.bold(`Items to give: `) + `${itemsToGive.join(', ')} -> value: ${itemsToGiveValue.keys} keys ${itemsToGiveValue.refined} refined --> (scrap: ${itemsToGiveValue.scrap})`)
+        log(chalk.blue.bold('[ trade ] ') + chalk.red.bold(`Items to receive: `) + `${itemsToReceive.join(', ')} --> value: ${itemsToReceiveValue.keys} keys ${itemsToReceiveValue.refined} refined --> (scrap: ${itemsToReceiveValue.scrap})`)
+        
+        itemsToReceiveValue.scrap >= itemsToGiveValue.scrap ? acceptOffer(offer) : declineOffer(offer)
+        
+    }
 })
 
 manager.on('receivedOfferChanged', (offer, oldState) => {
     if (offer.state === 3) { // Accepted
         log(chalk.blue.bold('[ trade ] ') + `Trade offer #${offer.id} changed: ${TradeOfferManager.ETradeOfferState[oldState]} -> ${TradeOfferManager.ETradeOfferState[offer.state]}`)
         notifyAdmin(offer)
-        log(chalk.blue.bold('[ trade ] ') + `Notified admin!`)
 
         offer.getExchangeDetails((error, status, tradeInitTime, receivedItems, sentItems) => {
             if (error) {
@@ -187,6 +168,44 @@ const notifyAdmin = (offer) => {
             })
     }
 }
+
+
+
+// ACCEPTING AND DECLINING OFFERS
+
+// Accept offer
+const acceptOffer = (offer) => new Promise((resolve, reject) => {
+    offer.accept((error, status) => {
+        if (error) {
+            reject(log(chalk.magenta.bold('[ trade ]') + `Unable to accept a trade offer: ${error.message}`))
+        } else {
+            if (status == 'pending') {
+                community.acceptConfirmationForObject(config.identitySecret, offer.id, (error) => {
+                    if (error) {
+                        log(chalk.magenta.bold('[ trade ]') + `Unable to confirm a trade offer: ${error.message}`)
+                    } else {
+                        log(chalk.blue.bold('[ trade ] ') + `Confirmed a trade offer #${offer.id}!`) 
+                    }
+                })
+            }
+            log(chalk.blue.bold('[ trade ] ') + `Accepted a trade offer #${offer.id} from #${offer.partner.getSteamID64()}!`)
+            resolve(offer) 
+        } 
+    })  
+})
+
+// Decline offer
+const declineOffer = (offer) => new Promise((resolve, reject) => {
+    offer.decline((error, status) => {
+        if (error) {
+            reject(log(chalk.magenta.bold('[ trade ]') + `Unable to reject a trade offer: ${error.message}`))
+        } else {
+            log(chalk.blue.bold('[ trade ] ') + `Rejected a trade offer #${offer.id} from #${offer.partner.getSteamID64()}!`)
+            resolve(offer) 
+        }
+    })
+})
+
 
 
 // schemaManager.init(function (err) {

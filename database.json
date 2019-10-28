@@ -3,13 +3,14 @@
         "name": "The Winter Wonderland Wrap",
         "buy": {
             "keys": 1,
-            "metal": 10.33
+            "metal": 5
         },
         "sell": {
             "keys": 2,
             "metal": 10.44
         },
         "maxStock": 1,
+        "boughtFor": 0,
         "itemSku": "976;6"
     },
     {
@@ -23,6 +24,7 @@
             "metal": 1.44
         },
         "maxStock": 1,
+        "boughtFor": 0,
         "itemSku": "a"
     },
     {
@@ -36,6 +38,7 @@
             "metal": 1.11
         },
         "maxStock": 1,
+        "boughtFor": 0,
         "itemSku": "a"
     },
     {
@@ -49,6 +52,7 @@
             "metal": 0
         },
         "maxStock": 1,
+        "boughtFor": 0,
         "itemSku": ""
     }
 ]
