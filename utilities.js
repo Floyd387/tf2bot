@@ -1,12 +1,17 @@
+const TradeOfferManager = require('steam-tradeoffer-manager')
+const SteamUser = require('steam-user')
+const SteamCommunity = require('steamcommunity')
 const fs = require('fs')
 const chalk = require('chalk')
 const Currencies = require('tf2-currencies') 
 const config = require('./config.js')
-
+const SKU = require('tf2-sku');
+const getSKU = require('./utils/getSKU.js')
 const log = console.log
 
 
-// DATABASE
+
+// ** DATABASE
 
 // Load Database
 const loadDatabase = () => {
@@ -26,10 +31,10 @@ const saveDatabase = (database) => {
 }
 
 
-// VALUE OF ITEMS
+// ** VALUE OF ITEMS
 
 // Value of items to give 
-const getValueItemsToGive = (database, itemsToGive) => {  
+const getValueItemsToGive = (offer, database, itemsToGive) => {  
             
     let sellKeys = 0
     let sellScrap = 0
@@ -42,14 +47,15 @@ const getValueItemsToGive = (database, itemsToGive) => {
         } else if (itemName === 'Refined Metal') {
             sellScrap += 9
         } else if (itemName === 'Mann Co. Supply Crate Key') {
-            sellKeys = 1
+            sellKeys += 1
         } else {
             let found = false
+            let sku = getSKU.getSKUfromObjectToGive(offer, itemName)
+            //console.log(sku)
             database.find((dataItem) => {
-                if (itemName == dataItem.name) {
+                if (sku == dataItem.itemSku) {
                     sellKeys += dataItem.sell.keys
-                    let sellMetal = dataItem.sell.metal
-                    sellScrap = Currencies.toScrap(sellMetal)
+                    sellScrap += Currencies.toScrap(dataItem.sell.metal)
                     found = true
                 } 
             })
@@ -73,7 +79,8 @@ const getValueItemsToGive = (database, itemsToGive) => {
 
 }
 
-const getValueItemsToReceive = (database, itemsToReceive) => {
+// Value of items to receive
+const getValueItemsToReceive = (offer, database, itemsToReceive) => {
 
     let buyKeys = 0
     let buyScrap = 0
@@ -86,14 +93,15 @@ const getValueItemsToReceive = (database, itemsToReceive) => {
         } else if (itemName === 'Refined Metal') {
             buyScrap += 9
         } else if (itemName === 'Mann Co. Supply Crate Key') {
-            buyKeys = 1
+            buyKeys += 1
         } else {
             let found = false
+            let sku = getSKU.getSKUfromObjectToReceive(offer, itemName)
+            console.log(sku)
             database.find((dataItem) => {
-                if (itemName == dataItem.name) {
+                if (sku == dataItem.itemSku) {
                     buyKeys += dataItem.buy.keys
-                    let buyMetal = dataItem.buy.metal
-                    buyScrap += Currencies.toScrap(buyMetal)
+                    buyScrap += Currencies.toScrap(dataItem.buy.metal)
                     found = true
                 }
             })
@@ -117,10 +125,75 @@ const getValueItemsToReceive = (database, itemsToReceive) => {
 
 }
 
+// ** COUNTERS
+
+const countItems = (itemsToGive, itemsToReceive) => {
+    let weGive = []
+    let weReceive = []
+
+    let itemsSent = itemsToGive.filter(item => !item.includes('Metal') && !item.includes('Mann Co. Supply Crate Key'))
+    let itemsReceived = itemsToReceive.filter(item => !item.includes('Metal') && !item.includes('Mann Co. Supply Crate Key'))
+
+
+    let scrapSent = itemsToGive.filter(item => item.includes('Scrap Metal'))
+    let scrapReceived = itemsToReceive.filter(item => item.includes('Scrap Metal'))
+  
+
+    let recSent = itemsToGive.filter(item => item.includes('Reclaimed Metal'))
+    let recReceived = itemsToReceive.filter(item => item.includes('Reclaimed Metal'))
+ 
+
+    let refSent = itemsToGive.filter(item => item.includes('Refined Metal'))
+    let refReceived = itemsToReceive.filter(item => item.includes('Refined Metal'))
+   
+
+    let keysSent = itemsToGive.filter(item => item.includes('Mann Co. Supply Crate Key'))
+    let keysReceived = itemsToReceive.filter(item => item.includes('Mann Co. Supply Crate Key'))
+
+    if (itemsSent.length > 0) {
+        weGive.push(itemsSent)
+    }
+    if (itemsReceived.length > 0) {
+        weReceive.push(itemsReceived)
+    }
+    if (keysSent.length > 0) {
+        weGive.push(`${keysSent.length}x Mann Co. Supply Crate Key`)
+    }
+    if (keysReceived.length > 0) {
+        weReceive.push(`${keysReceived.length}x Mann Co. Supply Crate Key`)
+    }
+    if (refSent.length > 0) {
+        weGive.push(`${refSent.length}x Refined Metal`)
+    }
+    if (refReceived.length > 0) {
+        weReceive.push(`${refReceived.length}x Refined Metal`)
+    }
+    if (recSent.length > 0) {
+        weGive.push(`${recSent.length}x Reclaimed Metal`)
+    }
+    if (recReceived.length > 0) {
+        weReceive.push(`${recReceived.length}x Reclaimed Metal`)
+    }
+    if (scrapSent.length > 0) {
+        weGive.push(`${scrapSent.length}x Scrap Metal`)
+    }
+    if (scrapReceived.length > 0) {
+        weReceive.push(`${scrapReceived.length}x Scrap Metal`)
+    }
+
+    return {
+        weGive: weGive,
+        weReceive: weReceive
+    }
+
+}
+
+
 module.exports = {
     loadDatabase: loadDatabase,
     saveDatabase: saveDatabase,
     getValueItemsToGive: getValueItemsToGive,
     getValueItemsToReceive: getValueItemsToReceive,
+    countItems: countItems
 }
 

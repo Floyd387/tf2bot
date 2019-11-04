@@ -1,6 +1,7 @@
 [
     {
         "name": "The Winter Wonderland Wrap",
+        "itemSku": "976;6",
         "buy": {
             "keys": 1,
             "metal": 5
@@ -10,11 +11,11 @@
             "metal": 10.44
         },
         "maxStock": 1,
-        "boughtFor": 0,
-        "itemSku": "976;6"
+        "boughtFor": 0
     },
     {
         "name": "Abominable Cosmetic Case",
+        "itemSku": "94;1",
         "buy": {
             "keys": 1,
             "metal": 1.33
@@ -24,11 +25,11 @@
             "metal": 1.44
         },
         "maxStock": 1,
-        "boughtFor": 0,
-        "itemSku": "a"
+        "boughtFor": 0
     },
     {
         "name": "Winter 2018 Cosmetic Case",
+        "itemSku": "2",
         "buy": {
             "keys": 5,
             "metal": 10
@@ -38,21 +39,34 @@
             "metal": 1.11
         },
         "maxStock": 1,
-        "boughtFor": 0,
-        "itemSku": "a"
+        "boughtFor": 0
     },
     {
         "name": "Tyrant's Helm",
+        "itemSku": "99;6",
         "buy": {
             "keys": 0,
             "metal": 0
         },
         "sell": {
-            "keys": 0,
-            "metal": 0
+            "keys": 1,
+            "metal": 0.11
         },
         "maxStock": 1,
-        "boughtFor": 0,
-        "itemSku": ""
+        "boughtFor": 0
+    },
+    {
+        "name": "Genuine Texas Ten Gallon",
+        "itemSku": "94;1",
+        "buy": {
+            "keys": 0,
+            "metal": 30
+        },
+        "sell": {
+            "keys": 2,
+            "metal": 2
+        },
+        "maxStock": 1,
+        "boughtFor": 0
     }
 ]
